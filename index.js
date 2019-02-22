@@ -1,7 +1,5 @@
 const express = require('express');
 const helmet = require('helmet');
-const knex = require('knex');
-const knexConfig = require('./knexfile');
 
 const db = require('./data/recipeBookHelpers');
 
@@ -65,17 +63,16 @@ server.get('/api/recipes', (req, res) => {
 
 server.post('/api/dishes/:id', (req, res) => {
     const recipe = req.body;
-    if(!recipe.recipe_name || recipe.ingredients.length === 0 || !recipe.instructions){
+    if(!recipe.recipe_name || !recipe.instructions){
         res.status(400).json({ error: 'Recipe needs a name, ingredients and instructions'})
     } else {
         db.addRecipe(recipe)
         .then(id => {
-            db.addDishRecipes(id[0], req.params.id);
-            res.status(201).json({ id, dishId: req.params.id })
+            db.addDishRecipes(id[0], req.params.id)
+                .then(id => {
+                        res.status(201).json({ id, dishId: req.params.id })
+                })
         })
-        // .then(() => {
-        //     recipe.ingredients.map(x => db.addRecipeIngredients(x.ingredientsId, id, x.quantity));
-        // })
         .catch(err => {
             console.log(err);
             res.status(500).json({ error: 'Could not add recipe' })
