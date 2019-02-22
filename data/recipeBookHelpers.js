@@ -6,7 +6,9 @@ module.exports = {
     getDishes,
     getDishRecipes,
     getRecipes,
+    getRecipe,
     getIngredients,
+    getRecipeIngredients,
     addDish,
     addRecipe,
     addDishRecipes,
@@ -30,13 +32,18 @@ function getDishRecipes(id) {
     .select('dishes.dish_name', 'recipes.recipe_name', 'dishRecipes.recipeId')
 }
 
-function getRecipes(){
+function getRecipes(id){
     return db('recipes');
-    // return db('dishRecipes')
-    // .join('dishes', 'dishRecipes.dishId', 'dishes.id')
-    // .join('recipes', 'dishRecipes.recipeId', '=', 'recipes.id')
-    // .select('dishes.dish_name', 'recipes.recipe_name', 'dishRecipes.recipeId', 'dishRecipes.dishId')
-    // .orderBy('recipes.recipe_name')
+}
+
+function getRecipe(id){
+    return db('recipes').where('recipes.id', '=', id).first();
+}
+
+function getRecipeIngredients(id){
+    return db('recipeIngredients')
+        .where('recipeIngredients.recipeId', id)
+        .join('ingredients', 'recipeIngredients.ingredientsId', 'ingredients.id')
 }
 
 function addRecipe(recipe){

@@ -61,6 +61,22 @@ server.get('/api/recipes', (req, res) => {
         })
 });
 
+server.get('/api/recipes/:id', (req, res) => {
+    const id = req.params.id
+    db.getRecipe(id)
+        .then(recipe => {
+            db.getRecipeIngredients(id)
+            .then(ingredients => {
+                res.status(200).json({ ...recipe, ingredients })
+            })
+
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ error: 'Could not get dish' })
+        })
+});
+
 server.post('/api/dishes/:id', (req, res) => {
     const recipe = req.body;
     if(!recipe.recipe_name || !recipe.instructions){
