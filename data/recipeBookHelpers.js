@@ -4,11 +4,13 @@ const db = knex(knexConfig.development);
 
 module.exports = {
     getDishes,
+    getDish,
     getDishRecipes,
     getRecipes,
     getRecipe,
     getIngredients,
     getRecipeIngredients,
+    getTopFive,
     addDish,
     addRecipe,
     addDishRecipes,
@@ -24,12 +26,20 @@ function addDish(dish){
     return db('dishes').insert(dish);
 }
 
+function getDish(id){
+    return db('dishes').where('dishes.id', id).first();
+}
+
 function getDishRecipes(id) {
     return db('dishRecipes')
     .join('dishes', 'dishRecipes.dishId', 'dishes.id')
     .join('recipes', 'dishRecipes.recipeId', '=', 'recipes.id')
     .where('dishRecipes.dishId', '=', id)
     .select('dishes.dish_name', 'recipes.recipe_name', 'dishRecipes.recipeId')
+}
+
+function getTopFive(){
+    return db('dishes').orderBy('dishes.id' ,'desc').limit(5);
 }
 
 function getRecipes(id){

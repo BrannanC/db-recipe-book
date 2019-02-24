@@ -1,11 +1,13 @@
 const express = require('express');
 const helmet = require('helmet');
+const cors = require('cors');
 
 const db = require('./data/recipeBookHelpers');
 
 const server = express();
 
 server.use(express.json());
+server.use(cors());
 server.use(helmet());
 
 // Dishes
@@ -21,13 +23,29 @@ server.get('/api/dishes', (req, res) => {
 });
 
 server.get('/api/dishes/:id', (req, res) => {
-    db.getDishRecipes(req.params.id)
-        .then(recipes => {
-            res.status(200).json({ recipes })
-        })
+    const id = req.params.id;
+    db.getDish(id)
+    .then(dish => {
+        db.getDishRecipes(id)
+            .then(recipes => {
+                res.status(200).json({ dish, recipes })
+            })
+    })
+
         .catch(err => {
             console.log(err);
             res.status(500).json({ error: 'Could not get dish' })
+        })
+});
+
+server.get('/api/topfivedishes', (req, res) => {
+    db.getTopFive()
+        .then(dishes => {
+            res.status(200).json({ dishes })
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ error: 'Could not get dishes' })
         })
 });
 
